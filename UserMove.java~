@@ -1,0 +1,135 @@
+/**
+ * Private inner class that represents a move made by the user. This class
+ * will be used to check if a move is valid, to move the piece on the 
+ * GUI grid, and also to store information to be used by the undo function.
+ */
+private class UserMove {
+ //private instance vars
+  private int direction; 
+  private Color repColor;
+  private String repText;
+  private Button oldButton, newButton;
+  private int oldX, oldY, newX, newY;
+  
+  /**
+   * Constructor that creates a UserMove by storing the direction given.
+   *
+   * @param d the direction of the user's mvoe
+   */
+  public UserMove(int d) {
+    direction = d;
+    curX = x; curY = y;
+    newX = x; newY = y;
+    
+    //determine new position
+    if (direction == LEFT) newY--;
+    else if (direction == RIGHT) newY++;
+    else if (direction == UP) newX--;
+    else if (direction == DOWN) newX++;
+    
+    //save old and new position
+    oldButton = buttonGrid[oldX][oldY];
+    newButton = buttonGrid[newX][newY];
+    
+    //save anything that was replaced by moving this piece
+    repColor = newButton.getBackground();
+    repNumber = newButton.getText();
+  }
+  
+  /**
+   * Actually moves the player's piece on the screen.
+   */
+  public void move() {
+    if (!isValidMove())
+      return; //don't do anything if the move is invalid
+    
+    //leave path (color + number)
+    if (isTarget())
+      oldButton.setBackground(ColorScheme.target());
+    else 
+      oldButton.setBackground(ColorScheme.path());
+    oldButton.setText("<html><font color='white'>" + 
+                      (counter++) + "</font></html>");
+    
+    //move piece (color, push onto undo, update labels)
+    newButton.setBackground(ColorScheme.character());
+    newButton.setText("");
+    undoStack.push(this);
+    lPanel.updateStepsLabel();
+    lPanel.updateNextLabel();
+  }
+  
+  /**
+   * Returns the color that was replaced by this move.
+   * 
+   * @return  the color that was replaced by this move.
+   */
+  public Color getReplacedColor() {
+    return repColor;
+  }
+  
+    /**
+   * Returns the text that was replaced by this move.
+   * 
+   * @return  the text that was replaced by this move.
+   */
+  public String getReplacedText() {
+    return repText;
+  }
+ 
+  /**
+   * Private helper method that returns true if the position of this move
+   * contains a target.
+   * 
+   * @return  a boolean indicating whether the position contains a target
+   */
+  private boolean isTarget() {
+    ArrayList<GridCoordinate> targets = gridGraph.getTargets();
+    for (GridCoordinate target: targets) {
+      if (target.getX()==newX && target.getY()==newY)
+        return true;
+    }
+    return false;
+  }
+
+  /**
+   * Private helper method that returns true if the move attempted is valid.
+   * 
+   * @return   a boolean that indicates whether this move is allowed
+   */
+  private boolean isValidMove() {
+    if (counter >= limit)
+      return false;
+    return isValidPosition(newX, newY);
+  }
+  
+  /**
+   * Private helper method that returns true if the position of this move 
+   * is valid on grid.
+   * 
+   * @return  a boolean indicating whether the given position exists in the grid
+   */
+  private boolean isValidPosition() {
+    boolean validX = newX>=0 && newX<height;
+    boolean validY = newY>=0 && newY<width;
+    if (validX && validY)
+      return !(newButton.getBackground().equals(ColorScheme.block()));
+    return false;
+  }
+  
+  /**
+   * Undoes this move.
+   */
+  public void undo() {
+    //move character back to "old" button (color, lower counter, update labels)
+    oldButton.setBackground(ColorScheme.character());
+    oldButton.setText("");
+    counter--;
+    lPanel.updateStepsLabel();
+    lPanel.updateNextLabel();
+    
+    //"uncover" what this move replaced (restore replaced color + text)
+    newButton.setBackground(repColor);
+    newButton.setText(repText);
+  }
+}

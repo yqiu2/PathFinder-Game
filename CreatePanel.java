@@ -1,0 +1,234 @@
+/**
+ * This class displays a panel that allows the user to place start, 
+ * target, and block tiles into the grid to create his/her own level
+ * and generate a text file to store the level. It displays 1 label, 
+ * 3 radio buttons, and 1 button, and a BlankGridPanel. 
+ * <p> 
+ * Priscilla implemented this class on her own.
+ * 
+ * @author Priscilla Lee
+ * @version December 17 2014
+ */
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class CreatePanel extends JPanel{
+  //private instance vars
+  private BlankGridPanel blankPanel;
+  private GamePanel gamePanel;
+  private JPanel sidePanel;
+  private JPanel borderedBlocks, borderedTargets, borderedStart;
+  private JRadioButton setStart, setTargets, setBlocks;
+  private JButton generateFile, mainMenu;
+  private JLabel createLevel, warningLabel;
+  private int width, height;
+  
+  /**
+   * Constructor that takes in a GamePanel and the dimensions of
+   * the desired grid as input.
+   * 
+   * @param gp the GamePanel that will contain this panel
+   * @param w  the width of the desired grid
+   * @param h  the height of the desired grid
+   */
+  public CreatePanel(GamePanel gp, int w, int h) {
+    gamePanel = gp;
+    width = w; 
+    height = h;
+    
+    //setting background & size
+    setPreferredSize(new Dimension(700,500));
+    setMinimumSize(new Dimension(700,500));
+    setBackground(ColorScheme.background());
+    
+    //initialize panels (side and grid)
+    sidePanel = new JPanel();
+    blankPanel = new BlankGridPanel(gamePanel, this, width, height);
+    
+    //adjust layout/design for the different panels
+    setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+    sidePanel.setLayout(new GridLayout(7,1));
+    blankPanel.setBorder(BorderScheme.padded());
+    
+    //initialize createLevel label, adjust design, add to sidePanel
+    createLevel = new JLabel("<html><font color='white'>LEVEL CREATOR</font><html>");
+    createLevel.setFont(new Font("Calibri", Font.BOLD, 20));
+    createLevel.setOpaque(true);
+    createLevel.setBackground(ColorScheme.labels());
+    createLevel.setBorder(BorderScheme.padding());
+    createLevel.setHorizontalAlignment(JLabel.CENTER);
+    createLevel.setPreferredSize(new Dimension(200,30));
+    createLevel.setMinimumSize(new Dimension(150,0));
+    sidePanel.add(createLevel);
+    
+    //initialize mainMenu label, adjust design, add to sidePanel
+    mainMenu = new JButton("<html><font color='white'>MAIN MENU</font></html>");
+    mainMenu.setFont(new Font("Calibri", Font.BOLD, 20));
+    mainMenu.setOpaque(true);
+    mainMenu.setBackground(ColorScheme.main());
+    mainMenu.addActionListener(new ButtonListener());
+    mainMenu.setBorder(BorderScheme.padding());
+    sidePanel.add(mainMenu);
+    
+    //initialize warning label, adjust design, add to sidePanel
+    warningLabel = new JLabel();
+    warningLabel.setFont(new Font("Calibri", Font.BOLD, 20));
+    warningLabel.setOpaque(true);
+    warningLabel.setBackground(ColorScheme.background());
+    warningLabel.setBorder(BorderScheme.padding());
+    warningLabel.setHorizontalAlignment(JLabel.CENTER);
+    sidePanel.add(warningLabel);
+    
+    //intialize setBlocks radio button, adjust design, add to sidePanel
+    setBlocks = new JRadioButton("<html><font color='white'>SET BLOCKS</font></html>");
+    setBlocks.setFont(new Font("Calibri", Font.BOLD, 20));
+    setBlocks.setOpaque(true);
+    setBlocks.setBackground(ColorScheme.unselected());
+    borderedBlocks = new JPanel();
+    borderedBlocks.setLayout(new GridLayout(1,1));
+    borderedBlocks.add(setBlocks);
+    borderedBlocks.setBorder(BorderScheme.padding());
+    borderedBlocks.setOpaque(true);
+    borderedBlocks.setBackground(ColorScheme.unselected());
+    sidePanel.add(borderedBlocks);
+    
+    //intialize setTargets radio button, adjust design, add to sidePanel
+    setTargets = new JRadioButton("<html><font color='white'>SET TARGETS</font></html>");
+    setTargets.setFont(new Font("Calibri", Font.BOLD, 20));
+    setTargets.setOpaque(true);
+    setTargets.setBackground(ColorScheme.unselected());
+    borderedTargets = new JPanel();
+    borderedTargets.setLayout(new GridLayout(1,1));
+    borderedTargets.add(setTargets);
+    borderedTargets.setBorder(BorderScheme.padding());
+     borderedTargets.setOpaque(true);
+    borderedTargets.setBackground(ColorScheme.unselected());
+    sidePanel.add(borderedTargets);
+    
+    //initialize setStart radio button, adjust design, add to sidePanel
+    setStart = new JRadioButton("<html><font color='white'>SET START</font></html>", true);
+    setStart.setFont(new Font("Calibri", Font.BOLD, 20));
+    setStart.setOpaque(true);
+    setStart.setBackground(ColorScheme.character());
+    borderedStart = new JPanel();
+    borderedStart.setLayout(new GridLayout(1,1));
+    borderedStart.add(setStart);
+    borderedStart.setBorder(BorderScheme.padding());
+     borderedStart.setOpaque(true);
+    borderedStart.setBackground(ColorScheme.unselected());
+    sidePanel.add(borderedStart);
+    
+    //group the radio buttons
+    ButtonGroup group = new ButtonGroup();
+    group.add(setBlocks);
+    group.add(setTargets);
+    group.add(setStart);
+    setBlocks.addActionListener(new ChoiceListener());
+    setTargets.addActionListener(new ChoiceListener());
+    setStart.addActionListener(new ChoiceListener());
+    
+    //initialize generateFile button, adjust design, add to sidePanel
+    generateFile  = new JButton("<html><font color='white'>GENERATE FILE</font></html>");
+    generateFile.setFont(new Font("Calibri", Font.BOLD, 20));
+    generateFile.setOpaque(true);
+    generateFile.setBackground(ColorScheme.generate());
+    generateFile.addActionListener(new ButtonListener());
+    generateFile.setBorder(BorderScheme.padding());
+    sidePanel.add(generateFile);
+    
+    //add panels to this LevelPanel
+    add(sidePanel);
+    add(blankPanel);
+  }
+  
+  /**
+   * Returns the radio button that was selected.
+   * 
+   * @return   a String that indicates which JRadioButton is currently 
+   *           selected ("block", "target", or "start")
+   */
+  public String getSelected() {
+    if (setBlocks.isSelected())
+      return "block";
+    else if (setTargets.isSelected())
+      return "target";
+    else //setStart
+      return "start";
+  }
+  
+  /**
+   * Updates the warning label with the given warning message.
+   * 
+   * @param msg the warning message to display on the warning label
+   */
+  public void setWarning(String msg) {
+    warningLabel.setText("<html><font color='white'>"+msg+"</font></html>");
+    warningLabel.setBackground(ColorScheme.warning());
+  }
+  
+  /**
+   * Resets the warning label to be blank.
+   */
+  public void resetWarning() {
+    warningLabel.setText("");
+    warningLabel.setBackground(ColorScheme.background());
+  }
+  
+  /**
+   * Private inner class that indicates the appropriate action when a
+   * button is clicked.
+   */
+  private class ButtonListener implements ActionListener {
+    public void actionPerformed (ActionEvent event) {
+      if (event.getSource() == generateFile)
+        blankPanel.generate();
+       else { //mainMenu
+        gamePanel.add(new MainMenuPanel(gamePanel));
+        gamePanel.remove(CreatePanel.this);
+        
+        gamePanel.revalidate();
+        gamePanel.repaint();
+        revalidate();
+        repaint();
+      }
+    }
+  }
+  
+  /**
+   * Private inner class that indicates the appropriate action when a
+   * radio button is clicked
+   */
+  private class ChoiceListener implements ActionListener {
+    public void actionPerformed (ActionEvent event) {
+      CreatePanel.this.resetWarning(); 
+      Object source = event.getSource();
+      if (source == setStart) {
+        setStart.setBackground(ColorScheme.character());
+        borderedStart.setBackground(ColorScheme.character());
+        setTargets.setBackground(ColorScheme.unselected());
+        borderedTargets.setBackground(ColorScheme.unselected());
+        setBlocks.setBackground(ColorScheme.unselected());
+        borderedBlocks.setBackground(ColorScheme.unselected());
+      }
+      else if (source == setTargets) {
+        setTargets.setBackground(ColorScheme.target());
+        borderedTargets.setBackground(ColorScheme.target());
+        setStart.setBackground(ColorScheme.unselected());
+        borderedStart.setBackground(ColorScheme.unselected());
+        setBlocks.setBackground(ColorScheme.unselected());
+        borderedBlocks.setBackground(ColorScheme.unselected());
+      }
+      else { //setBlocks
+        setBlocks.setBackground(ColorScheme.block());
+        borderedBlocks.setBackground(ColorScheme.block());
+        setStart.setBackground(ColorScheme.unselected());
+        borderedStart.setBackground(ColorScheme.unselected());
+        setTargets.setBackground(ColorScheme.unselected());
+        borderedTargets.setBackground(ColorScheme.unselected());
+      }
+    }
+  }
+}
+

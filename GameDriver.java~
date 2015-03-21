@@ -1,0 +1,28 @@
+/**
+ * GameDriver.java
+ * CS230 Final Project
+ * Author: Michelle Gao
+ * Date: 2 December 2014
+ * 
+ * This class acts as the driver for the shortest path finder 
+ * game. It instantiates one instance of GamePanel class, which in turn
+ * creates all the subpanels and then allows the user to play the game.
+ * 
+ */
+
+import javax.swing.*;
+
+public class GameDriver {
+  
+  //creates and displays the Path Finder game, then allows the user to play
+  public static void main(String[] args) {
+    JFrame frame = new JFrame("Path Finder");
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    
+    //creates an instance of a GamePanel class and adds it to the frame
+    frame.getContentPane().add(new GamePanel());
+    
+    frame.pack();
+    frame.setVisible(true);
+  }
+}

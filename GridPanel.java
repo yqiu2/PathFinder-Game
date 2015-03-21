@@ -1,0 +1,364 @@
+/**
+ * This class displays the grid of one level. It uses a 2d-array
+ * of JButtons (which are colored/bordered to indicate their "type").
+ * The JButtons allow the use of a KeyListener which allows the user 
+ * to move his/her piece with the keyboard arrow keys. A GridPanel
+ * also contains an undoStack which allows the user to undo his/her
+ * previous moves. Each GridPanel should represent a different level.
+ * <p>
+ * Priscilla was primarily responsible for the implementation of this class
+ * 
+ * @author Priscilla Lee
+ * @version December 2 2014
+ */
+
+import javax.swing.*;
+import java.awt.event.*;
+import java.awt.*;
+import javafoundations.*;
+import java.util.*;
+import javax.swing.border.*;
+
+public class GridPanel extends JPanel{
+  //public final static constant vars (directions)
+  public final static int LEFT = 0, RIGHT = 1, UP = 2, DOWN = 3;
+  
+  //private instance vars
+  private JButton[][] buttonGrid;
+  private GridGraph gridGraph;
+  private ArrayStack<UserMove> undoStack; //to store moves for our undo button
+  private int x, y; //keeps track of player’s current position
+  private int width, height;
+  private int counter, limit; //keeps track of # of steps moved vs limited steps
+  private LevelPanel lPanel;
+  private ArrayList<GridCoordinate> hints;
+  private int hintCounter;
+  
+  /**
+   * Constructor that constructs a 2d array of JButtons and an undoStack.
+   * 
+   * @param lp the LevelPanel that will contain this GridPanel
+   * @param gg the GridGraph that corresponds to this GridPanel
+   */
+  public GridPanel(LevelPanel lp, GridGraph gg) {
+    lPanel = lp;
+    gridGraph = gg;
+    width = gridGraph.getWidth();
+    height = gridGraph.getHeight();
+    
+    //setting layout & background & size
+    setLayout(new GridLayout(height, width));
+    setBackground(ColorScheme.background());
+    setPreferredSize(new Dimension(500,500));
+    setMinimumSize(new Dimension(500,500));
+    setMaximumSize(new Dimension(500,500));
+    
+    //create button grid of all WHITE JButtons
+    buttonGrid = new JButton[height][width];
+    for (int r = 0; r < height; r++) {
+      for (int c = 0; c < width; c++) {
+        JButton tile = new JButton();   
+        tile.addKeyListener(new ArrowListener());
+        tile.setOpaque(true);
+        tile.setBackground(Color.WHITE);
+        tile.setBorder(BorderScheme.standard());
+        
+        //set font & font size 
+        int n = 0;
+        if (height < 5 && width < 5) n = 30;
+        else if (height < 10 && width < 10) n = 25;
+        else if (height < 15 && width < 15) n = 20;
+        else if (height < 20 && width < 20) n = 15;
+        else n = 10;
+        tile.setFont(new Font("Calibri", Font.BOLD, n));
+        
+        buttonGrid[r][c] = tile;
+        add(tile);
+      }
+    }
+    
+    //set current position, counter, and limit
+    GridCoordinate start = gridGraph.getBegin();
+    x = start.getX(); 
+    y = start.getY();
+    buttonGrid[x][y].setBackground(ColorScheme.character());
+    counter = 0;
+    limit = gridGraph.getShortestPath();
+    
+    //set ("color in") blocks
+    for (GridCoordinate block: gridGraph.getBlocks()) {
+      int x = block.getX();
+      int y = block.getY();
+      buttonGrid[x][y].setBackground(ColorScheme.block());
+    }
+    
+    //set ("add border to") targets
+    ArrayList<GridCoordinate> targets = gridGraph.getTargets();
+    for (GridCoordinate target: targets) {
+      int x = target.getX();
+      int y = target.getY();
+      buttonGrid[x][y].setBorder(BorderScheme.target(width, height));
+    }
+    
+    //create undoStack
+    undoStack = new ArrayStack<UserMove>(); 
+    
+    //store list of hints
+    hints = gridGraph.getPathAnswer();
+    hintCounter = 0;
+  }
+  
+  /**
+   * Returns the current number of steps the user has moved.
+   * 
+   * @return the current step count
+   */
+  public int getStepCount(){
+    return counter;
+  }
+  
+  /**
+   * Displays a hint from the computer to help the user find the shortest path.
+   */
+  public void hint() {
+    if (hints.size() <= 1)
+      return;
+    GridCoordinate gc = hints.remove(hints.size()-2);
+    int x = gc.getX();
+    int y = gc.getY();
+    buttonGrid[x][y].setBackground(ColorScheme.hintPath());
+    buttonGrid[x][y].setText("<html><font color='white'>" + 
+                             (++hintCounter) + "</font></html>");
+  }
+  
+  /**
+   * Resets the grid completely by undoing all moves that have been made. This 
+   * method is meant to be called by LevelPanel when its reset button is pressed.
+   */
+  public void reset() {
+    while (!undoStack.isEmpty())
+      undo(); //keep undo-ing until no more left
+  }
+  
+  /**
+   * Undoes the most recent move made by the user. This method is meant to be 
+   * called by LevelPanel when its undo button is pressed.
+   */
+  public void undo() {
+    if (undoStack.size()>0) {
+      UserMove lastMove = undoStack.pop();
+      lastMove.undo();
+    }
+  }
+  
+  /**
+   * Moves the player's piece on the screen according to the direction given.
+   * 
+   * @param direction the direction in which the player intends to move
+   */
+  public void move(int direction) {
+    UserMove move = new UserMove(direction);
+    move.move();
+  }
+  
+  /**
+   * Returns true if player has successfully completed the level. This method
+   * loops through all the targets and checks to make sure they have all
+   * been visited by the player's piece.
+   * 
+   * @return a boolean indicating whether the level has been completed
+   */
+  public boolean levelComplete() {
+    ArrayList<GridCoordinate> targets = gridGraph.getTargets();
+    for (GridCoordinate target: targets)
+    { //has each target been reached (not white?)
+      int tx = target.getX();
+      int ty = target.getY();
+      JButton t = buttonGrid[tx][ty];
+      if (t.getBackground().equals(Color.WHITE))
+        return false; //return false if a target hasn't been reached
+    }
+    return true;
+  }
+  
+  /**
+   * Private inner class that implements KeyListener and allows user to use arrow 
+   * arrow keys to move his/her piece in the grid. 
+   */
+  private class ArrowListener implements KeyListener {
+    //keyPressed method required for KeyListener interface
+    public void keyPressed(KeyEvent e) {
+      if (e.getKeyCode() == KeyEvent.VK_LEFT) 
+        move(LEFT);
+      else if (e.getKeyCode() == KeyEvent.VK_RIGHT) 
+        move(RIGHT);
+      else if (e.getKeyCode() == KeyEvent.VK_UP) 
+        move(UP);
+      else if (e.getKeyCode() == KeyEvent.VK_DOWN) 
+        move(DOWN);
+      else if (e.getKeyCode() == KeyEvent.VK_U) 
+        undo();
+      else if (e.getKeyCode() == KeyEvent.VK_R) 
+        reset(); 
+      else if (e.getKeyCode() == KeyEvent.VK_H)
+        hint();
+      else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+        if (gridGraph.getLevel() == 0)
+          lPanel.loadRandomLevel(gridGraph.getWidth(), gridGraph.getHeight());
+        else
+          lPanel.loadNextLevel();
+      }
+    }
+    
+    //keyReleased method required for interface
+    public void keyReleased(KeyEvent e){}
+    
+    //keyTyped method required for interface
+    public void keyTyped(KeyEvent e){}
+  }
+  
+  /**
+   * Private inner class that represents a move made by the user. This class
+   * will be used to check if a move is valid, to move the piece on the 
+   * GUI grid, and also to store information to be used by the undo function.
+   */
+  private class UserMove {
+    //private instance vars
+    private int direction; 
+    private Color repColor;
+    private String repText;
+    private JButton oldButton, newButton;
+    private int oldX, oldY, newX, newY;
+    
+    /**
+     * Constructor that creates a UserMove by storing the direction given.
+     *
+     * @param d the direction of the user's mvoe
+     */
+    public UserMove(int d) {
+      direction = d;
+      
+      //save old position
+      oldX = x; oldY = y;
+      oldButton = buttonGrid[oldX][oldY];
+      
+      //determine and save new position
+      if (direction == LEFT) y--;
+      else if (direction == RIGHT) y++;
+      else if (direction == UP) x--;
+      else if (direction == DOWN) x++;
+      newX = x; newY = y;
+      if (isValidPosition())
+        newButton = buttonGrid[newX][newY];
+      else 
+        newButton = buttonGrid[0][0]; //use a "dummy" button
+   
+      //save anything that was replaced by moving this piece
+      repColor = newButton.getBackground();
+      repText = newButton.getText();
+    }
+      
+    /**
+     * Actually moves the player's piece on the screen.
+     */
+    public void move() {
+      if (!isValidMove()) {//BAD MOVE!!
+        x = oldX; y = oldY; //reset x and y position
+        return; //don't do anything if the move is invalid
+      }
+      
+      //leave path (color + number)
+      if (oldIsTarget())
+        oldButton.setBackground(ColorScheme.target());
+      else 
+        oldButton.setBackground(ColorScheme.path());
+      oldButton.setText("<html><font color='white'>" + 
+                        (counter++) + "</font></html>");
+      
+      //move piece (color, push onto undo, update labels)
+      newButton.setBackground(ColorScheme.character());
+      newButton.setText("");
+      undoStack.push(this);
+      lPanel.updateStepsLabel();
+      lPanel.updateNextLabel();
+    }
+    
+    /**
+     * Returns the color that was replaced by this move.
+     * 
+     * @return  the color that was replaced by this move.
+     */
+    public Color getReplacedColor() {
+      return repColor;
+    }
+    
+    /**
+     * Returns the text that was replaced by this move.
+     * 
+     * @return  the text that was replaced by this move.
+     */
+    public String getReplacedText() {
+      return repText;
+    }
+    
+    /**
+     * Private helper method that returns true if the position of this move
+     * contains a target.
+     * 
+     * @return  a boolean indicating whether the position contains a target
+     */
+    private boolean oldIsTarget() {
+      ArrayList<GridCoordinate> targets = gridGraph.getTargets();
+      for (GridCoordinate target: targets) {
+        if (target.getX()==oldX && target.getY()==oldY)
+          return true;
+      }
+      return false;
+    }
+    
+    /**
+     * Private helper method that returns true if the move attempted is valid.
+     * 
+     * @return   a boolean that indicates whether this move is allowed
+     */
+    private boolean isValidMove() {
+      if (counter >= limit)
+        return false; //because no steps left
+      if (!isValidPosition())
+        return false; //because not a valid position on grid
+      if (newButton.getBackground().equals(ColorScheme.block()))
+        return false; //because there's a block in the way
+      return true;
+    }
+    
+    /**
+     * Private helper method that returns true if the position of this move 
+     * is valid on grid.
+     * 
+     * @return  a boolean indicating whether the given position exists in the grid
+     */
+    private boolean isValidPosition() {
+      boolean validX = newX>=0 && newX<height;
+      boolean validY = newY>=0 && newY<width;
+      return validX && validY;
+    }
+    
+    /**
+     * Undoes this move.
+     */
+    public void undo() {
+      //move character back to "old" button (color, lower counter, update labels)
+      x = oldX; y = oldY;//update current position
+      oldButton.setBackground(ColorScheme.character());
+      oldButton.setText("");
+      counter--;
+      lPanel.updateStepsLabel();
+      lPanel.updateNextLabel();
+     
+      //"uncover" what this move replaced (restore replaced color + text)
+      newButton.setBackground(repColor);
+      newButton.setText(repText);
+
+    }
+  }
+}

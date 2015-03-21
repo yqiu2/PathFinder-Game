@@ -1,0 +1,20 @@
+Our program contains a total of 11 classes. We decided to divide the work by function. Priscilla worked on the GUI and its design, while Michelle and Amy worked together to implement the functionality.
+
+GUI CLASSES
+Priscilla --> BorderScheme.java (stores Border objects for design use)
+Priscilla --> ColorScheme.java (stores Color objects for design use)
+Priscilla --> GamePanel.java (contains a JLabel + inner panel)
+Priscilla --> GridPanel.java (displays a 2d array of JButtons)
+Priscilla --> InstructionsPanel.java (displays 1 JLabel + 2 JButtons)
+Priscilla --> LevelPanel.java (displays 2 JLabels + 4 JButtons + 1 GridPanel)
+Priscilla --> MainMenuPanel.java (displays 3 JButtons + 2 JComboBoxes + 2 JLabels)
+Priscilla --> EndGamePanel.java (displays 1 JButton containing image of end credits)
+Priscilla --> .gif files (for visual images)
+
+FUNCTIONALITY CLASSES
+Michelle --> GameDriver.java (runs the program)
+Michelle & Amy --> GridCoordinate.java (represents the vertices in our GridGraph)
+Michelle & Amy --> GridGraph.java (reads in from file, stores information, 
+                                   uses graph algorithms to calculate shortest path)
+Priscilla --> PathNotFoundException.java (thrown when a valid path does not exist)
+Michelle & Amy --> .txt files (for level information)

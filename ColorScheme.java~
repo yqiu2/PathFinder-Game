@@ -1,0 +1,269 @@
+/**
+ * This class stores Color objects to be recalled for later use when
+ * designing the GUI. ColorScheme uses static methods that return Color
+ * objects. 
+ * <p>
+ * Priscilla was primarily responsible for the implementation of this class. 
+ * 
+ * @author Priscilla
+ * @version December 2 2014
+ */
+
+import java.awt.Color;
+
+public class ColorScheme {
+  
+  /**
+   * Returns a Color object used for the GUI background.
+   * 
+   * @return    GUI background color 
+   */
+  public static Color background(){
+    return new Color(188,231,241);
+  }
+  
+  /**
+   * Returns a Color object used for dark outlined borders.
+   * 
+   * @return    GUI dark color
+   */
+  public static Color dark(){
+    return new Color(65,65,65);
+  } 
+  
+  /**
+   * Returns a Color object used for labels.
+   * 
+   * @return    GUI label color
+   */
+  public static Color labels() {
+    return new Color(65,65,65);
+  }
+  
+  /**
+   * Returns a Color object used for the instructions button in MainMenuPanel.
+   * 
+   * @return    MainMenuPanel instructions button color
+   */
+  public static Color instructions() {
+    return new Color(112,146,190);
+  }
+  
+  /**
+   * Returns a Color object used for the create button in MainMenuPanel.
+   * 
+   * @return    MainMenuPanel create button color
+   */
+  public static Color create() {
+    return new Color(255,201,14);
+  }
+  
+  /**
+   * Returns a Color object used for the random level button in MainMenuPanel.
+   *
+   * @return    MainMenuPanel random button color
+   */
+  public static Color random() {
+    return new Color(255,127,39);
+  }
+  
+  /**
+   * Returns a Color object used for the play button in MainMenuPanel.
+   * 
+   * @return    MainMenuPanel play button color
+   */
+  public static Color play() {
+    return new Color(112,146,190);
+  }
+  
+    /**
+   * Returns a Color object used for the play custom button in MainMenuPanel.
+   * 
+   * @return    MainMenuPanel play custom button color
+   */
+  public static Color playCustom() {
+    return new Color(112,146,190);
+  }
+  
+  /**
+   * Returns a Color object used for the next button in InstructionsPanel.
+   * 
+   * @return    InstructionsPanel next/previous button color
+   */
+  public static Color nextPrevious() {
+    return new Color(255,127,39);
+  }
+  
+  /**
+   * Returns a Color object used for the play button in InstructionsPanel.
+   * 
+   * @return    InstructionsPanel play button color
+   */
+  public static Color skipPlay() {
+    return new Color(255,201,14);
+  }
+  
+  /**
+   * Returns a Color object used for the next level button in LevelPanel.
+   * 
+   * @return    LevelPanel next level button color
+   */
+  public static Color next() {
+    return new Color(112,146,190);
+  }
+  
+  /**
+   * Returns a Color object used for the main menu button in LevelPanel.
+   * 
+   * @return    LevelPanel main menu button color
+   */
+  public static Color main() {
+    return new Color(112,146,190);
+  }
+  
+  /**
+   * Returns a Color object used for the undo button in LevelPanel.
+   * 
+   * @return    LevelPanel undo button color
+   */
+  public static Color undo() {
+    return new Color(255,127,39);
+  }
+  
+  /**
+   * Returns a Color object used for the reset button in LevelPanel.
+   * 
+   * @return    LevelPanel reset button color
+   */
+  public static Color reset() {
+    return new Color(255,201,14);
+  }
+  
+    /**
+   * Returns a Color object used for the hint button in LevelPanel.
+   * 
+   * @return    LevelPanel reset hint color
+   */
+  public static Color hint() {
+    return new Color(34,177,76);
+  }
+  
+     /**
+   * Returns a Color object used for the hint path in GridPanel.
+   * 
+   * @return    GridPanel hint path color
+   */
+  public static Color hintPath() {
+    return new Color(154, 249, 108);
+  }
+  
+  /**
+   * Returns a Color object used for a block tile in GridPanel.
+   * 
+   * @return    GridPanel block tile color
+   */
+  public static Color block() {
+    return new Color(65,65,65);
+  }
+  
+  /**
+   * Returns a Color object used for the target tile in GridPanel.
+   * 
+   * @return    GridPanel target tile color
+   */
+  public static Color target(){
+    return new Color(255,127,39);
+  }
+  
+  /**
+   * Returns a Color object used for the character player piece tile 
+   * in GridPanel.
+   * 
+   * @return    GridPanel character play piece tile color
+   */
+  public static Color character(){
+    return new Color(255,201,14);
+  }
+  
+  /**
+   * Returns a Color object used for the shaded path in GridPanel.
+   * 
+   * @return    GridPanel shaded path color
+   */
+  public static Color path(){
+    return new Color(255,231,145);
+  }
+  
+  /**
+   * Returns a Color object used for the generate file button in CreatePanel.
+   * 
+   * @return    CreatePanel generate file button color
+   */
+  public static Color generate() {
+    return new Color(112,146,190);
+  }
+  
+  /**
+   * Returns a Color object used for unselected radio buttons in CreatePanel.
+   * 
+   * @return    CreatePanel unselected radio button color
+   */
+  public static Color unselected() {
+    return new Color(200,200,200);
+  }
+  
+    /**
+   * Returns a Color object used for the warning label in CreatePanel.
+   * 
+   * @return    CreatePanel warning label color
+   */
+  public static Color warning() {
+    return new Color(237,28,36);
+  }
+  
+      /**
+   * Returns a Color object used for the save button in GeneratePanel.
+   * 
+   * @return    GeneratePanel save button color
+   */
+  public static Color save() {
+    return new Color(112,146,190);
+  }
+  
+        /**
+   * Returns a Color object used for the bad status label in GeneratePanel.
+   * 
+   * @return    GeneratePanel bad status label color
+   */
+  public static Color bad() {
+    return new Color(237,28,36);
+  }
+  
+         /**
+   * Returns a Color object used for the good status label in GeneratePanel.
+   * 
+   * @return    GeneratePanel good status label color
+   */
+  public static Color good() {
+    return new Color(34,177,76);
+  }
+  
+    /**
+   * Returns a Color object used for the create again button in GeneratePanel.
+   * 
+   * @return    GeneratePanel createAgain button color
+   */
+  public static Color createAgain() {
+    return new Color(255,127,39);
+  }
+  
+  /**
+   * Returns a Color object used for the play level button in GeneratePanel.
+   * 
+   * @return    GeneratePanel playLevel button color
+   */
+  public static Color playLevel() {
+    return new Color(255,201,14);
+  }
+  
+}

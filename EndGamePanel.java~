@@ -1,0 +1,75 @@
+/*
+ * EndGamePanel.java
+ * CS230 Final Project
+ * Author: Priscilla Lee
+ * Date: 14 December 2014
+ * 
+ * An EndGamePanel displays the end game congratulations and credits.
+ * It contains only a button with a credit.gif image. When the button
+ * is clicked or any key is pressed on the keyboard, the user is returned
+ * to the main menu.
+ */
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+
+public class EndGamePanel extends JPanel {
+  //private instance vars
+  private GamePanel gamePanel;
+  private JButton credits;
+  
+  //constructor that takes in a GamePanel as input
+  public EndGamePanel(GamePanel gp) {
+    gamePanel = gp;
+    
+    //setting background & layout
+    setBackground(ColorScheme.background());
+    
+    //initializing end game credits button & adjusting design
+    ImageIcon icon = new ImageIcon("credits.gif");
+    credits = new JButton(icon);
+    credits.setOpaque(true);
+    credits.setBackground(ColorScheme.background());
+    credits.setBorder(BorderScheme.padding());
+    credits.addActionListener(new ButtonListener());
+    credits.addKeyListener(new ArrowListener());
+    add(credits);
+  }
+  
+  //implements ActionListener, indicates appropriate action when button is clicked
+  private class ButtonListener implements ActionListener {
+    public void actionPerformed (ActionEvent event) {
+      //simply return to main  menu if button is clicked
+      gamePanel.add(new MainMenuPanel(gamePanel));
+      gamePanel.remove(EndGamePanel.this);
+      
+      gamePanel.revalidate();
+      gamePanel.repaint();
+      revalidate();
+      repaint();
+    }
+  }
+  
+  //implements KeyListener, indicates appropriate action when any key is pressed
+  private class ArrowListener implements KeyListener {
+    //keyPressed method required for KeyListener interface
+    public void keyPressed(KeyEvent e) {
+      //simply return to main  menu if any key is pressed
+      gamePanel.add(new MainMenuPanel(gamePanel));
+      gamePanel.remove(EndGamePanel.this);
+      
+      gamePanel.revalidate();
+      gamePanel.repaint();
+      revalidate();
+      repaint();
+    }
+    
+    //keyReleased method required for interface
+    public void keyReleased(KeyEvent e){}
+    
+    //keyTyped method required for interface
+    public void keyTyped(KeyEvent e){}
+  }
+}
